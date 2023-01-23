@@ -1,13 +1,10 @@
-FROM alpine:latest
-ENV TINI_VERSION v0.18.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-amd64 /tini
-RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--"]
+FROM python:3-slim
 
-RUN mkdir /app \
- && apk --update add python3 py3-pip
-WORKDIR /app
-ADD . /app/
-RUN pip3 install -e .
+COPY . /src
 
-CMD /app/entrypoint.sh
+RUN pip install --upgrade /src && \
+    cp /usr/local/bin/py_arris_exporter py_arris_exporter
+
+EXPOSE 9393
+
+ENTRYPOINT ["/py_arris_exporter"]
